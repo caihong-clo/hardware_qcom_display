@@ -102,7 +102,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     debug.sf.earlyGl.sf.duration=10500000 \
     debug.sf.late.sf.duration=10500000 \
     vendor.display.enable_async_vds_creation=1 \
-    vendor.display.enable_rounded_corner=1 \
+    vendor.display.enable_rounded_corner?=1 \
     vendor.display.disable_3d_adaptive_tm=1 \
     vendor.display.disable_sdr_dimming=0 \
     vendor.display.enable_rc_support=1 \
@@ -132,7 +132,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     vendor.display.secure_preview_buffer_format=420_sp \
     vendor.gralloc.secure_preview_buffer_format=420_sp \
     vendor.gralloc.secure_preview_only=1
-    PRODUCT_PROPERTY_OVERRIDES += vendor.display.enable_rounded_corner=1
+    PRODUCT_PROPERTY_OVERRIDES += vendor.display.enable_rounded_corner?=1
     PRODUCT_PROPERTY_OVERRIDES += vendor.display.disable_rounded_corner_thread=0
 endif
 

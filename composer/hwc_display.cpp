@@ -855,6 +855,39 @@ void HWCDisplay::BuildLayerStack() {
     layer_stack_.layers.push_back(layer);
   }
 
+  // The resource manager aborts on a stack whose only device layers are mask
+  // layers, which happens for a frame or two while SystemUI restarts. Let the
+  // GPU draw the masks for such frames instead.
+  if (layer_stack_.flags.mask_present) {
+    bool has_device_layer = false;
+    for (auto layer : layer_stack_.layers) {
+      if (!layer->input_buffer.flags.mask_layer && !layer->flags.skip) {
+        has_device_layer = true;
+        break;
+      }
+    }
+    if (!has_device_layer) {
+      // Decoration masks are flagged again on every frame, so this only
+      // affects the current one.
+      bool mask_remaining = false;
+      for (auto hwc_layer : layer_set_) {
+        Layer *layer = hwc_layer->GetSDMLayer();
+        if (!layer->input_buffer.flags.mask_layer) {
+          continue;
+        }
+        if (hwc_layer->GetOrigClientRequestedCompositionType() ==
+            Composition::DISPLAY_DECORATION) {
+          layer->input_buffer.flags.mask_layer = false;
+          layer->flags.skip = true;
+          layer_stack_.flags.skip_present = true;
+        } else {
+          mask_remaining = true;
+        }
+      }
+      layer_stack_.flags.mask_present = mask_remaining;
+    }
+  }
+
   // TODO(user): Set correctly when SDM supports geometry_changes as bitmask
 
   layer_stack_.flags.geometry_changed =
